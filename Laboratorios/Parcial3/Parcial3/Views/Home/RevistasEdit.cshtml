@@ -1,0 +1,29 @@
+﻿@model Parcial3.Models.Revista
+
+@{
+    ViewBag.Title = "Editar Revista";
+}
+
+<h2>Editar Revista</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @Html.HiddenFor(model => model.RevistaId)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.NombreRevista)
+            @Html.TextBoxFor(model => model.NombreRevista, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ISSN)
+            @Html.TextBoxFor(model => model.ISSN, new { @class = "form-control" })
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="@Url.Action("RevistasIndex")" class="btn btn-default">Cancelar</a>
+    </div>
+}

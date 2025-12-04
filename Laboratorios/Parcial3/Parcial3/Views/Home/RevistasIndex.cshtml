@@ -1,0 +1,37 @@
+﻿@model IEnumerable<Parcial3.Models.Revista>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Lista de Revistas";
+}
+
+<h2>Revistas</h2>
+
+<p><a href="@Url.Action("RevistasCreate", "Home")">Crear nueva revista</a></p>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>ISSN</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.RevistaId</td> <!-- Cambiado de IdRevista -->
+            <td>@item.NombreRevista</td> <!-- También revisar NombreRevista -->
+            <td>@item.ISSN</td>
+
+            <td>
+                <a href="@Url.Action("RevistasEdit", "Home", new { id = item.RevistaId })">Editar</a> |
+
+                @using (Html.BeginForm("RevistasDelete", "Home", new { id = item.RevistaId }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <button type="submit" onclick="return confirm('¿Está seguro de eliminar esta revista?');">Eliminar</button>
+                }
+            </td>
+
+        </tr>
+    }
+</table>

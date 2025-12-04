@@ -1,0 +1,29 @@
+﻿@model Parcial3.Models.Autor
+
+@{
+    ViewBag.Title = "Editar Autor";
+}
+
+<h2>Editar Autor</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @Html.HiddenFor(model => model.AutorId)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Nombre)
+            @Html.TextBoxFor(model => model.Nombre, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Apellido)
+            @Html.TextBoxFor(model => model.Apellido, new { @class = "form-control" })
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="@Url.Action("AutoresIndex")" class="btn btn-default">Cancelar</a>
+    </div>
+}

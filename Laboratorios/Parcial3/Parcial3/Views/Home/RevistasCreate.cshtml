@@ -1,0 +1,38 @@
+﻿@model Parcial3.Models.Revista
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Crear Revista";
+}
+
+<h2>Crear Revista</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <div class="form-group mb-3">
+            @Html.LabelFor(m => m.NombreRevista, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.NombreRevista, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.NombreRevista, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group mb-3">
+            @Html.LabelFor(m => m.ISSN, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.ISSN, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.ISSN, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a href="@Url.Action("RevistasIndex", "Home")" class="btn btn-secondary ms-2">Cancelar</a>
+            </div>
+        </div>
+    </div>
+}

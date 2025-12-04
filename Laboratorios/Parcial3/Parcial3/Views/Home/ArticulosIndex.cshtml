@@ -1,0 +1,37 @@
+﻿@model IEnumerable<Parcial3.Models.Articulo>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Lista de Artículos";
+}
+
+<h2>Artículos</h2>
+
+<p><a href="@Url.Action("ArticulosCreate", "Home")">Crear nuevo artículo</a></p>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Título</th>
+        <th>Resumen</th>
+        <th>Acciones</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.ArticuloId</td>
+            <td>@item.Titulo</td>
+            <td>@item.Resumen</td>
+            <td>
+                <a href="@Url.Action("ArticulosEdit", "Home", new { id = item.ArticuloId })">Editar</a> |
+
+                @using (Html.BeginForm("ArticulosDelete", "Home", new { id = item.ArticuloId }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <button type="submit" onclick="return confirm('¿Está seguro de eliminar este artículo?');">Eliminar</button>
+                }
+            </td>
+ 
+        </tr>
+    }
+</table>
