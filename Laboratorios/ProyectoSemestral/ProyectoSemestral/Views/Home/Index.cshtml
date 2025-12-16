@@ -1,0 +1,228 @@
+﻿@{
+    ViewBag.Title = "Predicciones Futbol";
+}
+
+<style>
+    body {
+        background-image: url('/Content/img/5634934.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        font-family: Arial, sans-serif;
+    }
+
+    .contenedor {
+        width: 380px;
+        margin: 40px auto;
+        padding: 25px;
+        border-radius: 15px;
+        background: #f8f8f8;
+        box-shadow: 0 0 10px #bbb;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .formulario {
+        display: none;
+    }
+
+        .formulario.activo {
+            display: block;
+        }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+        .form-group label {
+            font-weight: 600;
+            
+        }
+
+    .btn {
+        width: 100%;
+        padding: 9px;
+        border-radius: 8px;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: #007bff;
+        color: white;
+    }
+
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+
+    #msgLogin, #msgRegistro {
+        text-align: center;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    .cambiar-vista {
+        margin-top: 15px;
+        text-align: center;
+        cursor: pointer;
+        color: #007bff;
+        font-weight: 600;
+    }
+
+</style>
+
+<div class="contenedor">
+
+    <!-- LOGIN -->
+    <div id="loginForm" class="formulario activo">
+        <h2>Iniciar Sesión</h2>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" id="loginPassword" class="form-control" />
+        </div>
+
+        <button class="btn btn-primary" onclick="login()">Ingresar</button>
+
+        <p id="msgLogin"></p>
+
+        <p class="cambiar-vista" onclick="mostrarRegistro()">¿No tienes cuenta? Regístrate</p>
+    </div>
+
+    <!-- REGISTRO -->
+    <div id="registroForm" class="formulario">
+        <h2>Crear Cuenta</h2>
+
+        <div class="form-group">
+            <label>Usuario</label>
+            <input type="text" id="regUsuario" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="regEmail" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" id="regPassword" class="form-control" />
+        </div>
+
+        <button class="btn btn-success" onclick="registrar()">Registrarse</button>
+
+        <p id="msgRegistro"></p>
+
+        <p class="cambiar-vista" onclick="mostrarLogin()">¿Ya tienes cuenta? Inicia sesión</p>
+    </div>
+
+</div>
+
+<script>
+    function mostrarRegistro() {
+        document.getElementById("loginForm").classList.remove("activo");
+        document.getElementById("registroForm").classList.add("activo");
+    }
+
+    function mostrarLogin() {
+        document.getElementById("registroForm").classList.remove("activo");
+        document.getElementById("loginForm").classList.add("activo");
+    }
+
+    // ============================
+    // LOGIN (CORREGIDO)
+    // ============================
+    function login() {
+        const datos = {
+            Email: document.getElementById("loginEmail").value,
+            Contraseña: document.getElementById("loginPassword").value
+        };
+
+        fetch("/api/usuarios/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos)
+        })
+            .then(res => res.json().catch(() => null).then(data => ({ ok: res.ok, data })))
+            .then(res => {
+
+                if (!res.ok) {
+                    document.getElementById("msgLogin").innerText = "Credenciales incorrectas";
+                    document.getElementById("msgLogin").style.color = "red";
+                    return;
+                }
+
+                document.getElementById("msgLogin").innerText = "Ingresando...";
+                document.getElementById("msgLogin").style.color = "green";
+
+                // 🔐 Crear sesión en el servidor
+                fetch("/Home/CrearSesion", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        idUsuario: res.data.idUsuario,
+                        usuario: res.data.usuario
+                    })
+                })
+                    .then(() => {
+                        // (Opcional) LocalStorage
+                        localStorage.setItem("idUsuario", res.data.idUsuario);
+                        localStorage.setItem("usuario", res.data.usuario);
+
+                        window.location.href = "/Home/Inicio";
+                    });
+            })
+            .catch(() => {
+                document.getElementById("msgLogin").innerText = "Error del servidor";
+                document.getElementById("msgLogin").style.color = "red";
+            });
+    }
+
+    // ============================
+    // REGISTRO
+    // ============================
+    function registrar() {
+        const datos = {
+            Usuario: document.getElementById("regUsuario").value,
+            Email: document.getElementById("regEmail").value,
+            Contraseña: document.getElementById("regPassword").value
+        };
+
+        fetch("/api/usuarios/registrar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos)
+        })
+            .then(async res => {
+                const texto = await res.text();
+
+                if (!res.ok) {
+                    document.getElementById("msgRegistro").innerText = texto;
+                    document.getElementById("msgRegistro").style.color = "red";
+                    return;
+                }
+
+                document.getElementById("msgRegistro").innerText = "Usuario registrado correctamente";
+                document.getElementById("msgRegistro").style.color = "green";
+
+                setTimeout(() => mostrarLogin(), 1500);
+            });
+    }
+
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        history.go(1);
+    };
+</script>

@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = "Partidos";
+}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-image: url('/Content/img/5618044.jpg');
+        background-size: cover; /* que cubra toda la pantalla */
+        background-position: center; /* centrada */
+        background-repeat: no-repeat;
+        background-attachment: fixed; /* efecto fijo */
+    }
+
+    .contenedor {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 36px;
+        margin-bottom: 20px;
+        color: white;
+        font-weight: 900;
+    }
+
+    .partido {
+        background: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .equipos {
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .fecha {
+        font-size: 14px;
+        color: #555;
+    }
+
+    .btn-pred {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    p {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: white;
+        font-weight: 500;
+    
+    }
+
+        .btn-prediccion:hover {
+            background: #0056b3;
+        }
+
+    .btn-titulo {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .titulo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+</style>
+
+<div class="contenedor">
+    <div class="titulo">
+        <h2>📅 Partidos disponibles</h2>
+        <button class="btn-titulo" onclick="regresarMenu()">Volver al menú</button>
+    </div>
+
+    <div id="listaPartidos">
+        <!-- Aquí se cargan los partidos -->
+    </div>
+</div>
+
+<script>
+    const idUsuario = localStorage.getItem("idUsuario");
+
+    function regresarMenu() {
+        window.location.href = "/Home/Inicio";
+    }
+
+    // 🔒 Protección de la vista
+    if (!idUsuario) {
+        window.location.href = "/Home/Index";
+    }
+
+    fetch(`/api/partidos/disponibles/${idUsuario}`)
+        .then(res => res.json())
+        .then(data => {
+
+            const contenedor = document.getElementById("listaPartidos");
+
+            if (!data || data.length === 0) {
+                contenedor.innerHTML = "<p>No tienes partidos disponibles.</p>";
+                return;
+            }
+
+            data.forEach(p => {
+                contenedor.innerHTML += `
+        <div class="partido">
+            <div>
+                <div class="equipos">
+                    ${p.EquipoLocal} vs ${p.EquipoVisitante}
+                </div>
+                <div class="fecha">
+                    ${new Date(p.Fecha).toLocaleString()}
+                </div>
+            </div>
+            <button class="btn-pred"
+                    onclick="irAPrediccion()">
+                Predecir
+            </button>
+        </div>
+    `;
+            });
+
+        })
+        .catch(() => {
+            document.getElementById("listaPartidos").innerHTML =
+                "<p>Error al cargar los partidos.</p>";
+        });
+
+    function irAPrediccion() {
+        const idUsuario = localStorage.getItem("idUsuario");
+        if (!idUsuario) {
+            alert("Debes iniciar sesión primero");
+            return;
+        }
+        // Redirige a la página de predicciones
+        window.location.href = `/Home/Prediccion?idUsuario=${idUsuario}`;
+    }
+</script>

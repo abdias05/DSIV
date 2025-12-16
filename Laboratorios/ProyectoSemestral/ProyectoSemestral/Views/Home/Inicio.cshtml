@@ -1,0 +1,140 @@
+﻿@{
+    ViewBag.Title = "Inicio";
+}
+
+<style>
+    body {
+        background-image: url('/Content/img/inicio.jpg');
+        background-size: cover; /* que cubra toda la pantalla */
+        background-position: center; /* centrada */
+        background-repeat: no-repeat;
+        background-attachment: fixed; /* efecto fijo */
+        font-family: Arial, sans-serif;
+    }
+
+    .dashboard {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 30px;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+        .header h2 {
+            margin: 0;
+            font-size: 30px; /* tamaño del texto */
+            font-weight: 900;
+            background: white; /* fondo blanco */
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+    .card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+        }
+
+    .logout {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+</style>
+
+<div class="dashboard">
+
+    <div class="header">
+        <h2>Bienvenido, <span id="usuarioNombre"></span></h2>
+        <button class="logout" onclick="logout()">Cerrar sesión</button>
+    </div>
+
+    <div class="card-container">
+        <div class="card" onclick="irAPartidos()">
+            <h3>📅 Partidos</h3>
+            <p>Ver partidos disponibles</p>
+        </div>
+
+        <div class="card" onclick="irAPredicciones()">
+            <h3>🎯 Predicciones</h3>
+            <p>Realiza tus predicciones</p>
+        </div>
+
+        <div class="card" onclick="irARanking()">
+            <h3>🏆 Ranking</h3>
+            <p>Consulta la tabla general</p>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    // Mostrar nombre del usuario
+    document.getElementById("usuarioNombre").innerText =
+        localStorage.getItem("usuario") ?? "Usuario";
+
+    // Logout seguro
+    function logout() {
+        localStorage.clear();
+        window.location.href = "/Home/Logout";
+    }
+
+    // ⛔ Evitar volver con botón Atrás
+    window.onload = function () {
+        if (!localStorage.getItem("usuario")) {
+            window.location.href = "/Home/Index";
+        }
+    };
+
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        history.go(1);
+    };
+
+    // Redirecciones
+    function irAPartidos() {
+        window.location.href = "/Home/Partidos";
+    }
+
+    function irAPredicciones() {
+        const idUsuario = localStorage.getItem("idUsuario");
+        if (!idUsuario) {
+            alert("Debes iniciar sesión primero");
+            return;
+        }
+        window.location.href = "/Home/Prediccion?idUsuario=" + idUsuario;
+    }
+
+    function irARanking() {
+        window.location.href = "/Home/Ranking";
+    }
+</script>
+
